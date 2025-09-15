@@ -29,5 +29,4 @@ async function handler(_request: AuthenticatedRequest) {
   }
 }
 
-// export const GET = withRole(['admin'], handler);
-export const GET = handler
+export const GET = withRole(['admin'], handler);

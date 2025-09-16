@@ -9,7 +9,8 @@ async function seed() {
     // Create admin user
     const adminPasswordHash = await bcrypt.hash('admin123', 10);
     const [adminUser] = await db.insert(users).values({
-      name: 'Admin User',
+      firstName: 'Admin',
+      lastName: 'User',
       email: 'admin@claudeink.com',
       passwordHash: adminPasswordHash,
       role: 'admin',
@@ -20,7 +21,8 @@ async function seed() {
     // Create sample tattooist user
     const tattooistPasswordHash = await bcrypt.hash('tattooist123', 10);
     const [tattooistUser] = await db.insert(users).values({
-      name: 'Jane Smith',
+      firstName: 'Jane',
+      lastName: 'Smith',
       email: 'jane@claudeink.com',
       passwordHash: tattooistPasswordHash,
       role: 'tattooist',
@@ -35,7 +37,7 @@ async function seed() {
       approved: true,
     }).returning();
 
-    console.log('✅ Tattooist profile created for:', tattooistUser.name);
+    console.log('✅ Tattooist profile created for:', `${tattooistUser.firstName} ${tattooistUser.lastName}`);
 
     // Create sample portfolio items
     const portfolioItems = [
@@ -82,7 +84,8 @@ async function seed() {
     // Create sample customer
     const customerPasswordHash = await bcrypt.hash('customer123', 10);
     const [customerUser] = await db.insert(users).values({
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'john@example.com',
       passwordHash: customerPasswordHash,
       role: 'customer',

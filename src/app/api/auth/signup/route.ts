@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { hash } from 'bcrypt';
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { users } from '@/lib/db/schema';
+import { users, tattooists } from '@/lib/db/schema';
 import { signupSchema } from '@/lib/auth/schemas';
 import { setAuthCookie } from '@/lib/auth/jwt';
 
@@ -56,7 +56,17 @@ export async function POST(request: NextRequest) {
         email: users.email,
         role: users.role,
       });
-    
+
+    // If user is signing up as a tattooist, create tattooist profile
+    if (role === 'tattooist') {
+      await db
+        .insert(tattooists)
+        .values({
+          userId: newUser.id,
+          approved: false, // Default to unapproved
+        });
+    }
+
     // Create session
     await setAuthCookie({
       userId: newUser.id,

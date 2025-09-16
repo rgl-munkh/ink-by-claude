@@ -21,6 +21,8 @@ async function handler(request: AuthenticatedRequest) {
     const { imageUrl, description, styleTags } = result.data;
     const userId = request.auth!.userId;
 
+    console.log(request.auth)
+
     // Find the tattooist record for this user
     const [tattooist] = await db
       .select()

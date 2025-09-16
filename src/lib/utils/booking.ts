@@ -40,6 +40,8 @@ export async function validateSlotAvailability(
   }
 
   // Check if slot falls within any availability window
+
+  console.log(tattooistAvailability, slotTime, slotEndTime)
   const isWithinAvailability = tattooistAvailability.some(avail => {
     return isTimeInRange(slotTime, slotEndTime, avail.startTime, avail.endTime);
   });

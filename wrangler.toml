@@ -1,7 +1,0 @@
-compatibility_flags = [ "nodejs_compat" ]
-compatibility_date = "2024-09-23"
-
-[[hyperdrive]]
-binding = "HYPERDRIVE"
-id = "58d9b8bbbb254a5baad1ad52f570e5fa"
-

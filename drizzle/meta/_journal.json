@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1758202872433,
+      "tag": "0000_cultured_menace",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1758203418000,
+      "tag": "0001_tearful_callisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1758203795815,
+      "tag": "0002_hot_toad",
+      "breakpoints": true
+    }
+  ]
+}

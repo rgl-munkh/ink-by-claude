@@ -2,26 +2,30 @@
 
 ---
 
+<!-- - Simple rate-limit for login attempts (in-memory or small throttle). -->
+<!-- - Middleware protects all tattooist routes (`/tattooist/*`, `/api/tattooist/*`). -->
+<!-- - Implement `POST /tattooist/logout` to clear session. -->
+
+<!-- - Invalid credentials return `401` and do not set a session. -->
+<!-- - Protected routes return `401` for unauthenticated requests. -->
+<!-- - Logout clears session cookie. -->
+
+
 ## Story 1 — Tattooist (Admin) — Hard-coded Login & Session
 **Requirements**
 - Create a login page `/tattooist/login` that accepts username & password.
-- Use hard-coded credentials from environment variables: `TATTOOIST_USERNAME`, `TATTOOIST_PASSWORD`.
+- Use hard-coded credentials from constant variables: `TATTOOIST_USERNAME`, `TATTOOIST_PASSWORD`.
 - Successful login issues secure HTTP-only session cookie (or short-lived JWT cookie).
-- Middleware protects all tattooist routes (`/tattooist/*`, `/api/tattooist/*`).
-- Implement `POST /tattooist/logout` to clear session.
-- Simple rate-limit for login attempts (in-memory or small throttle).
 
 **Acceptance Criteria**
 - Correct credentials redirect to `/tattooist/dashboard` and set a session.
-- Invalid credentials return `401` and do not set a session.
-- Protected routes return `401` for unauthenticated requests.
-- Logout clears session cookie.
+
 
 **API / DB / Tests**
 - `POST /tattooist/login` — body `{ username, password }`.
 - `POST /tattooist/logout`.
 - Middleware checks session cookie and attaches `currentUser` (hard-coded artist).
-- Tests: login success/failure, access control to protected routes.
+<!-- - Tests: login success/failure, access control to protected routes. -->
 
 ---
 

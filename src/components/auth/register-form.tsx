@@ -9,7 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AuthButton } from './auth-button';
-import { signupSchema, type SignupInput } from '@/lib/auth/schemas';
+import { signupSchema } from '@/lib/auth/schemas';
+
+type UserRole = 'customer' | 'tattooist' | 'admin';
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -48,11 +50,10 @@ export function RegisterForm() {
   });
 
   const watchedFields = watch();
-  const isStep1Valid = watchedFields.firstName && watchedFields.lastName && !errors.firstName && !errors.lastName;
-  const isStep2Valid = watchedFields.email && watchedFields.password && !errors.email && !errors.password;
+  const isStep1Valid = !!watchedFields.email && !!watchedFields.password && !errors.email && !errors.password;
 
   const handleNext = async () => {
-    const fieldsToValidate = step === 1 ? ['firstName', 'lastName'] as const : ['email', 'password'] as const;
+    const fieldsToValidate = ['email', 'password'] as const;
     const isStepValid = await trigger(fieldsToValidate);
 
     if (isStepValid) {
@@ -64,17 +65,18 @@ export function RegisterForm() {
     setStep(step - 1);
   };
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (formData: unknown) => {
     setIsLoading(true);
     setError(null);
 
     try {
+      const payload = signupSchema.parse(formData);
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
@@ -84,14 +86,13 @@ export function RegisterForm() {
         return;
       }
 
-      // Role-based redirect
-      const { user } = result;
+      const { user } = result as { user: { role: UserRole } };
       switch (user.role) {
         case 'admin':
           router.push('/admin');
           break;
         case 'tattooist':
-          router.push('/tattooist');
+          router.push('/onboarding/tattooist');
           break;
         default:
           router.push('/dashboard');
@@ -116,56 +117,21 @@ export function RegisterForm() {
       {isMobile && (
         <div>
           <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-            <span>Step {step} of 3</span>
-            <span>{Math.round((step / 3) * 100)}% complete</span>
+            <span>Step {step} of 2</span>
+            <span>{Math.round((step / 2) * 100)}% complete</span>
           </div>
           <div className="w-full bg-muted rounded-full h-2">
             <div
               className="bg-primary h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(step / 3) * 100}%` }}
+              style={{ width: `${(step / 2) * 100}%` }}
             />
           </div>
         </div>
       )}
 
-      {/* Step 1: Personal Information */}
+      {/* Step 1: Account Information */}
       {(step === 1 || !isMobile) && (
         <div className={`space-y-4 ${step !== 1 && isMobile ? 'hidden' : ''}`}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                placeholder="Enter your first name"
-                className="h-12 text-base lg:h-9 lg:text-sm"
-                aria-invalid={errors.firstName ? 'true' : 'false'}
-                {...register('firstName')}
-              />
-              {errors.firstName && (
-                <p className="text-sm text-red-600 dark:text-red-400">{errors.firstName.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                placeholder="Enter your last name"
-                className="h-12 text-base lg:h-9 lg:text-sm"
-                aria-invalid={errors.lastName ? 'true' : 'false'}
-                {...register('lastName')}
-              />
-              {errors.lastName && (
-                <p className="text-sm text-red-600 dark:text-red-400">{errors.lastName.message}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Step 2: Account Information */}
-      {(step === 2 || !isMobile) && (
-        <div className={`space-y-4 ${step !== 2 && isMobile ? 'hidden' : ''}`}>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -198,13 +164,13 @@ export function RegisterForm() {
         </div>
       )}
 
-      {/* Step 3: Role Selection */}
-      {(step === 3 || !isMobile) && (
-        <div className={`space-y-4 ${step !== 3 && isMobile ? 'hidden' : ''}`}>
+      {/* Step 2: Role Selection */}
+      {(step === 2 || !isMobile) && (
+        <div className={`space-y-4 ${step !== 2 && isMobile ? 'hidden' : ''}`}>
           <div className="space-y-2">
             <Label htmlFor="role">Account Type</Label>
             <Select
-              onValueChange={(value) => setValue('role', value as 'customer' | 'tattooist' | 'admin')}
+              onValueChange={(value) => setValue('role', value as UserRole)}
               defaultValue="customer"
             >
               <SelectTrigger className="h-12 text-base lg:h-9 lg:text-sm">
@@ -230,20 +196,17 @@ export function RegisterForm() {
       {/* Mobile Navigation Buttons */}
       {isMobile && (
         <div className="space-y-2">
-          {step < 3 && (
+          {step < 2 && (
             <AuthButton
               type="button"
               onClick={handleNext}
-              disabled={
-                (step === 1 && !isStep1Valid) ||
-                (step === 2 && !isStep2Valid)
-              }
+              disabled={!isStep1Valid}
             >
               Next
             </AuthButton>
           )}
 
-          {step === 3 && (
+          {step === 2 && (
             <AuthButton type="submit" isLoading={isLoading} disabled={!isValid}>
               Create Account
             </AuthButton>

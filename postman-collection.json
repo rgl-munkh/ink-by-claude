@@ -641,6 +641,350 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Request Management",
+      "item": [
+        {
+          "name": "Get Tattooist Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tattooist/requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tattooist", "requests"]
+            },
+            "description": "Get all requests assigned to the authenticated tattooist"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/tattooist/requests",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "tattooist", "requests"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"requests\": [\n    {\n      \"id\": \"req_abc123xyz789\",\n      \"name\": \"John Doe\",\n      \"phone\": \"+1-555-0123\",\n      \"email\": \"john.doe@example.com\",\n      \"description\": \"Traditional Japanese dragon tattoo with cherry blossoms\",\n      \"size\": \"Full sleeve (12x8 inches)\",\n      \"placement\": \"Right arm\",\n      \"images\": [\n        \"https://mock-r2-bucket.com/public/dragon-ref.jpg\"\n      ],\n      \"preferredDates\": [\"2024-12-15\", \"2024-12-20\"],\n      \"status\": \"new\",\n      \"createdAt\": \"2024-09-18T20:00:00.000Z\"\n    }\n  ],\n  \"count\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Offer for Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quotedAmount\": 1500,\n  \"depositPercent\": 25,\n  \"availableSlots\": [\n    \"2024-12-15T10:00:00Z\",\n    \"2024-12-20T14:00:00Z\",\n    \"2024-12-22T09:00:00Z\"\n  ],\n  \"message\": \"Thank you for your request! I'm excited to work on this traditional Japanese dragon design. The quote includes a full sleeve with detailed scales, cherry blossoms, and premium color work. The 25% deposit secures your booking, and we can discuss final details during consultation.\",\n  \"expiresAt\": \"2024-12-30T23:59:59Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/requests/req_abc123xyz789/offer",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "requests", "req_abc123xyz789", "offer"]
+            },
+            "description": "Create an offer for a specific request (tattooist-only, requires authentication)"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quotedAmount\": 1500,\n  \"depositPercent\": 25,\n  \"availableSlots\": [\n    \"2024-12-15T10:00:00Z\",\n    \"2024-12-20T14:00:00Z\"\n  ],\n  \"message\": \"Excited to work on this design!\",\n  \"expiresAt\": \"2024-12-30T23:59:59Z\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/requests/req_abc123xyz789/offer",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "requests", "req_abc123xyz789", "offer"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"offer\": {\n    \"id\": \"offer_xyz789abc123\",\n    \"requestId\": \"req_abc123xyz789\",\n    \"quotedAmount\": 1500,\n    \"depositPercent\": 25,\n    \"depositAmount\": 375,\n    \"availableSlots\": [\n      \"2024-12-15T10:00:00Z\",\n      \"2024-12-20T14:00:00Z\"\n    ],\n    \"message\": \"Excited to work on this design!\",\n    \"expiresAt\": \"2024-12-30T23:59:59.000Z\",\n    \"createdAt\": \"2024-09-18T20:30:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "Request Already Has Offer",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quotedAmount\": 1500,\n  \"depositPercent\": 25,\n  \"availableSlots\": [\"2024-12-15T10:00:00Z\"],\n  \"message\": \"Test offer\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/requests/req_abc123xyz789/offer",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "requests", "req_abc123xyz789", "offer"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Request already has an offer\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Offer Details (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/offers/offer_xyz789abc123",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "offers", "offer_xyz789abc123"]
+            },
+            "description": "Get offer details - public endpoint for clients to view offers"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/offers/offer_xyz789abc123",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "offers", "offer_xyz789abc123"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"offer\": {\n    \"id\": \"offer_xyz789abc123\",\n    \"quotedAmount\": 1500,\n    \"depositPercent\": 25,\n    \"depositAmount\": 375,\n    \"availableSlots\": [\n      \"2024-12-15T10:00:00Z\",\n      \"2024-12-20T14:00:00Z\",\n      \"2024-12-22T09:00:00Z\"\n    ],\n    \"message\": \"Thank you for your request! I'm excited to work on this traditional Japanese dragon design...\",\n    \"expiresAt\": \"2024-12-30T23:59:59.000Z\",\n    \"createdAt\": \"2024-09-18T20:30:00.000Z\",\n    \"isExpired\": false\n  },\n  \"request\": {\n    \"id\": \"req_abc123xyz789\",\n    \"name\": \"John Doe\",\n    \"phone\": \"+1-555-0123\",\n    \"email\": \"john.doe@example.com\",\n    \"description\": \"Traditional Japanese dragon tattoo with cherry blossoms\",\n    \"size\": \"Full sleeve (12x8 inches)\",\n    \"placement\": \"Right arm\",\n    \"images\": [\n      \"https://mock-r2-bucket.com/public/dragon-ref.jpg\"\n    ],\n    \"preferredDates\": [\"2024-12-15\", \"2024-12-20\"],\n    \"status\": \"offered\",\n    \"createdAt\": \"2024-09-18T20:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "Offer Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/offers/invalid_offer_id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "offers", "invalid_offer_id"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Offer not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Select Slot (Book Offer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"slotIso\": \"2024-12-15T10:00:00Z\",\n  \"contactName\": \"John Doe\",\n  \"contactPhone\": \"+1-555-0123\",\n  \"idempotencyKey\": \"client-booking-12345-unique-key\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/offers/offer_xyz789abc123/select",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "offers", "offer_xyz789abc123", "select"]
+            },
+            "description": "Select a slot from an offer and create a reservation (anonymous - no auth required). Uses idempotency key for safe retries."
+          },
+          "response": [
+            {
+              "name": "Success - Booking Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"slotIso\": \"2024-12-15T10:00:00Z\",\n  \"contactName\": \"John Doe\",\n  \"contactPhone\": \"+1-555-0123\",\n  \"idempotencyKey\": \"client-booking-12345\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/offers/offer_xyz789abc123/select",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "offers", "offer_xyz789abc123", "select"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"booking\": {\n    \"id\": \"booking_abc123def456\",\n    \"offerId\": \"offer_xyz789abc123\",\n    \"customerName\": \"John Doe\",\n    \"customerPhone\": \"+1-555-0123\",\n    \"slot\": \"2024-12-15T10:00:00.000Z\",\n    \"durationMinutes\": 120,\n    \"quotedAmount\": 1500,\n    \"depositAmount\": 375,\n    \"status\": \"reserved\",\n    \"reservationExpiresAt\": \"2024-09-18T20:45:00.000Z\",\n    \"paymentStatus\": \"unpaid\",\n    \"createdAt\": \"2024-09-18T20:30:00.000Z\"\n  },\n  \"idempotent\": false\n}"
+            },
+            {
+              "name": "Success - Idempotent Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"slotIso\": \"2024-12-15T10:00:00Z\",\n  \"contactName\": \"John Doe\",\n  \"contactPhone\": \"+1-555-0123\",\n  \"idempotencyKey\": \"client-booking-12345\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/offers/offer_xyz789abc123/select",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "offers", "offer_xyz789abc123", "select"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"booking\": {\n    \"id\": \"booking_abc123def456\",\n    \"offerId\": \"offer_xyz789abc123\",\n    \"customerName\": \"John Doe\",\n    \"customerPhone\": \"+1-555-0123\",\n    \"slot\": \"2024-12-15T10:00:00.000Z\",\n    \"durationMinutes\": 120,\n    \"quotedAmount\": 1500,\n    \"depositAmount\": 375,\n    \"status\": \"reserved\",\n    \"reservationExpiresAt\": \"2024-09-18T20:45:00.000Z\",\n    \"paymentStatus\": \"unpaid\",\n    \"createdAt\": \"2024-09-18T20:30:00.000Z\"\n  },\n  \"idempotent\": true\n}"
+            },
+            {
+              "name": "Slot No Longer Available",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"slotIso\": \"2024-12-15T10:00:00Z\",\n  \"contactName\": \"Jane Smith\",\n  \"contactPhone\": \"+1-555-0456\",\n  \"idempotencyKey\": \"different-client-key\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/offers/offer_xyz789abc123/select",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "offers", "offer_xyz789abc123", "select"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Selected slot is no longer available due to conflicts\"\n}"
+            },
+            {
+              "name": "Offer Expired",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"slotIso\": \"2024-12-15T10:00:00Z\",\n  \"contactName\": \"John Doe\",\n  \"contactPhone\": \"+1-555-0123\",\n  \"idempotencyKey\": \"expired-offer-key\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/offers/expired_offer_id/select",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "offers", "expired_offer_id", "select"]
+                }
+              },
+              "status": "Gone",
+              "code": 410,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Offer has expired\"\n}"
+            }
+          ]
+        }
+      ]
     }
   ],
   "event": [

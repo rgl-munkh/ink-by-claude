@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
 import { requests, tattooists } from '@/db/schema';
 import { notifyNewRequest } from '@/lib/notifications';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 const createRequestSchema = z.object({
@@ -13,6 +14,10 @@ const createRequestSchema = z.object({
   placement: z.string().min(1, 'Placement is required'),
   images: z.array(z.string().url(), 'At least one image is required').min(1),
   preferredDates: z.array(z.string()).optional(),
+  // New fields for artist-specific requests
+  requestedArtistId: z.string().optional(),
+  requestType: z.enum(['general', 'artist-specific']).optional().default('general'),
+  budget: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -28,9 +33,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the first available tattooist or use a default one
-    const availableTattooists = await db.select().from(tattooists).limit(1);
-    const tattooistId = availableTattooists.length > 0 ? availableTattooists[0].id : null;
+    // Determine which tattooist to assign the request to
+    let tattooistId = null;
+
+    if (validatedData.requestType === 'artist-specific' && validatedData.requestedArtistId) {
+      // For artist-specific requests, assign to the requested artist
+      const requestedTattooist = await db.select().from(tattooists).where(eq(tattooists.id, validatedData.requestedArtistId)).limit(1);
+      tattooistId = requestedTattooist.length > 0 ? requestedTattooist[0].id : null;
+    } else {
+      // For general requests, assign to the first available tattooist
+      const availableTattooists = await db.select().from(tattooists).limit(1);
+      tattooistId = availableTattooists.length > 0 ? availableTattooists[0].id : null;
+    }
 
     const newRequest = await db
       .insert(requests)

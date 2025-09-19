@@ -30,5 +30,5 @@ export function getDatabase(d1Database?: D1Database) {
   return db;
 }
 
-export type Database = ReturnType<typeof getDatabase>;
+export type Database = NonNullable<ReturnType<typeof getDatabase>>;
 export * from '@/db/schema';

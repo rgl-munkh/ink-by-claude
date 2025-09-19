@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth';
-import { getDatabase } from '@/lib/db';
+import { getDatabase, Database } from '@/lib/db';
 import { availability, tattooists, users } from '@/db/schema';
 import { checkAvailabilityOverlap, validateAvailabilityTimes, getAvailabilityBlocks } from '@/lib/availability';
 import { z } from 'zod';
@@ -12,7 +12,7 @@ const createAvailabilitySchema = z.object({
   note: z.string().optional(),
 });
 
-async function getOrCreateTattooist(db: any, userId: string) {
+async function getOrCreateTattooist(db: Database, userId: string) {
   // First try to find existing user
   const existingUser = await db.select().from(users).where(eq(users.id, userId)).limit(1);
 
